@@ -262,7 +262,7 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
         df.loc[aux_configuration , aux_surgeon] = probabilities[i].values[0]
     
     # Format of prediction
-    formatted_df = df.style.format({"Predictions": "{:.6f}".format})
+    formatted_df = df.style.format({"Predictions": "{:.4f}".format})
     col1, col2, col3 = st.columns(3)
 
     with col1:
