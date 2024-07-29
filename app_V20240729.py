@@ -263,7 +263,16 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
     
     # Format of prediction
     formatted_df = df.style.format({"Predictions": "{:.6f}".format})
-    st.write(formatted_df)
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.write(' ')
+    
+    with col2:
+        st.write(formatted_df)
+    
+    with col3:
+        st.write(' ')
 
     return df
 
