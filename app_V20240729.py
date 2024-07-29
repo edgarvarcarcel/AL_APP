@@ -77,25 +77,25 @@ def resume(model, filename):
 def initialize_app():
     # Load Examples
     example_path = r'data'
-    example_filename = r'\examples.xlsx'
+    example_filename = r'/examples.xlsx'
     example_data = pd.read_excel(example_path + example_filename)
     print('File loaded -->' , example_path + example_filename)
     
     # Load original data
     input_path = r'data'
-    input_filename = r'\reduced_op_UK_merged_data_final_21062024.csv'
+    input_filename = r'/reduced_op_UK_merged_data_final_21062024.csv'
     input_data = pd.read_csv(input_path + input_filename , decimal = '.' , sep = ';')
     print('File loaded -->' , input_path + input_filename)
     
     # Load MinMaxScaler
     path_scaler = r'models'
-    filename_scaler = r'\Scaler.sav'
+    filename_scaler = r'/Scaler.sav'
     scaler = pkl.load(open(path_scaler + filename_scaler , 'rb'))
     print('File loaded -->' , path_scaler + filename_scaler)
     
     # Load KNN Imputer
     path_knn = r'models'
-    filename_knn = r'\KNN_Imputer.sav'
+    filename_knn = r'/KNN_Imputer.sav'
     imputer = pkl.load(open(path_knn + filename_knn , 'rb'))
     print('File loaded -->' , path_knn + filename_knn)
    
@@ -105,7 +105,7 @@ def initialize_app():
     output_size = 2
     dropout_prob = 0.1
     model = FullyConnectedModel(input_size, hidden_sizes, output_size, dropout_prob)
-    resume(model, r'models\Pytorch_Model.pth')
+    resume(model, r'models/Pytorch_Model.pth')
     print('Pytorch Model Loaded')
     
     # Define columns
