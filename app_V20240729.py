@@ -371,30 +371,27 @@ if selected == 'Prediction':
     approach = st.sidebar.selectbox('Approach', ('1: Laparoscopic' ,
                                                  '2: Robotic' , '3: Open to open',
                                                  '4: Conversion to open',
-                                                 '5: Conversion to laparoscopy',
-                                                 '6: Transanal (ta TME , TATA , TAMIS)'))
+                                                 '5: Conversion to laparoscopy'))
     preoperative_steroid_use = st.sidebar.selectbox('Steroid Use', ('Yes' , 'No'))
     preoperative_nsaids_use = st.sidebar.selectbox('Nsaids Use', ('Yes' , 'No'))
     active_smoking = st.sidebar.selectbox('Active Smoking', ('Yes' , 'No'))
     liver_metastasis_at_time_of_anastomosis = st.sidebar.selectbox('Liver metastasis at time of anastomosis', ('Yes' , 'No'))
-    BIHistoryOfDiabetes = st.sidebar.selectbox('BI History of Diabetes', ('Yes' , 'No'))
+    BIHistoryOfDiabetes = st.sidebar.selectbox('Diabetes', ('Yes' , 'No'))
     preoperative_blood_transfusion = st.sidebar.selectbox('Preoperative Blood Transfusion', ('Yes' , 'No'))
     perforation = st.sidebar.selectbox('Perforation', ('Yes' , 'No'))
     #surgeon_experience = st.sidebar.selectbox('Surgeon Experience', ('Yes' , 'No'))
     conversion = st.sidebar.selectbox('Conversion to laparoscopic', ('Yes' , 'No'))
     anastomotic_technique = st.sidebar.selectbox('Anastomotic Technique', ('1: Stapler' ,
                                                                            '2: Hand-sewn',
-                                                                           '3: Stapler and Hand-sewn',
-                                                                           '4: Unknown'))
+                                                                           '3: Stapler and Hand-sewn'))
     protective_stomy = st.sidebar.selectbox('Protective Stomy', ('Yes' , 'No'))
-    BIHistoryOfIschaemicHeartDisease = st.sidebar.selectbox('BI History of Ischaemic Heart Disease', ('Yes' , 'No'))
+    BIHistoryOfIschaemicHeartDisease = st.sidebar.selectbox('Ischaemic Heart Disease', ('Yes' , 'No'))
     alcohol_abuse = st.sidebar.selectbox('Alcohol Abuse', ('Yes' , 'No'))
     asa_score = st.sidebar.selectbox('ASA Score', ('1: Healthy Person',
                                              '2: Mild Systemic disease',
                                              '3: Severe syatemic disease',
                                              '4: Severe systemic disease that is a constan threat to life',
-                                             '5: Moribund person',
-                                             '6: Unkonw'))
+                                             '5: Moribund person'))
     
     dataframe_input = pd.DataFrame({'sex' : [sex],
                                     'neoadjuvant_therapy' : [neoadjuvant_therapy],
