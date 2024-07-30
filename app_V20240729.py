@@ -274,7 +274,8 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
                               values = ['Probability'],
                               index = ['Surgeon Experience' , 'Configuration' , 'Approach'],
                               aggfunc = 'sum').sort_values(by = 'Probability' , ascending = True)
-        
+    
+    mean_value = pivot_df['Probability'].values.mean()       
         
     # Create a dataframe with the results as a matrix
     df = pd.DataFrame(index=values_of_anastomotic_configuration.keys(), columns=values_of_surgeon_experience.keys())
@@ -292,7 +293,7 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
     formatted_df = pivot_df.style.format({"Probability": "{:.4f}".format})
     # Create message to show the best option
     best_option = f"With **Surgeon Experience:** {posible_values[list(min_probability.keys())[-1]][0]}, **Configuration:** {posible_values[list(min_probability.keys())[-1]][1]} and **Approach:**  {posible_values[list(min_probability.keys())[-1]][2]}, the likelihood of anastomotic leakage is the lowest with a value of:{min_probability[list(min_probability.keys())[-1]] * 100 : .6f}%." 
-    difference_message = f"This is a reduction of {(max_probability[list(max_probability.keys())[-1]] - min_probability[list(min_probability.keys())[-1]]) * 100 : .6}% with respect to other options."
+    difference_message = f"This is a mean reduction of {(max_probability[list(max_probability.keys())[-1]] - mean_value) * 100 : .6}% with respect to other options."
     st.write(best_option)
     st.write(difference_message)
     st.write('Results for all options:')
