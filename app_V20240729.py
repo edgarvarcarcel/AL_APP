@@ -230,15 +230,21 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
                                            'End to Side' : 4}
     values_of_surgeon_experience = {'Yes' : 2,
                                     'No' : 1}
-    posible_values = list(product(values_of_surgeon_experience , values_of_anastomotic_configuration))
+    values_of_approach = {'1: Laparoscopic' : 1 ,
+                          '2: Robotic' : 2 ,
+                          '3: Open to open' : 3,
+                          '4: Conversion to open' : 4,
+                          '5: Conversion to laparoscopy' : 5}
+    posible_values = list(product(values_of_surgeon_experience , values_of_anastomotic_configuration , values_of_approach))
     min_probability = {-1 : 2.0}
     max_probability = {-1 : -1.0}
     
     for i in range(len(posible_values)):
         print('#' * 50)
-        print('Making prediction usung surgeon experience = ' , posible_values[i][0] , 'configuration =' , posible_values[i][1])
+        print('Making prediction usung surgeon experience = ' , posible_values[i][0] , 'configuration =' , posible_values[i][1] , 'approach =' , posible_values[i][2])
         df_cat_encoded['surgeon_experience'] = dictionary_categorical_features['surgeon_experience'][posible_values[i][0]]
         df_cat_encoded['anastomotic_configuration'] = values_of_anastomotic_configuration[posible_values[i][1]]
+        df_cat_encoded['approach'] = values_of_approach[posible_values[i][2]]
         df_hasher = pd.concat([df_num,
                                df_cat_encoded] , axis = 1)
         df_hasher = df_hasher[selected_features]
@@ -256,6 +262,20 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
             min_probability[i] = probabilities[i].values[0]
         if probabilities[i].values[0] > max_probability[list(max_probability.keys())[-1]]:
             max_probability[i] = probabilities[i].values[0]
+    aux_df = pd.DataFrame()
+    for i in range(len(probabilities)):
+        aux = pd.DataFrame({'Surgeon Experience' : [posible_values[i][0]],
+                            'Configuration' : [posible_values[i][1]],
+                            'Approach' : [posible_values[i][2]],
+                           'Probability' : [probabilities[i].values[0]]})
+        aux_df = pd.concat([aux_df,
+                            aux] , axis = 0)
+    pivot_df = pd.pivot_table(aux_df,
+                              values = ['Probability'],
+                              index = ['Surgeon Experience' , 'Configuration' , 'Approach'],
+                              aggfunc = 'sum').sort_values(by = 'Probability' , ascending = True)
+        
+        
     # Create a dataframe with the results as a matrix
     df = pd.DataFrame(index=values_of_anastomotic_configuration.keys(), columns=values_of_surgeon_experience.keys())
     # Fill the DataFrame with the product of their corresponding values
@@ -269,23 +289,14 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
         df.loc[aux_configuration , aux_surgeon] = probabilities[i].values[0]
     
     # Format of prediction
-    formatted_df = df.style.format({"Predictions": "{:.4f}".format})
+    formatted_df = pivot_df.style.format({"Probability": "{:.4f}".format})
     # Create message to show the best option
-    best_option = f"With Surgeon Experience: {posible_values[list(min_probability.keys())[-1]][0]} and Configuration: {posible_values[list(min_probability.keys())[-1]][1]}, the likelihood of anastomotic leakage is the lowest with a value of:{min_probability[list(min_probability.keys())[-1]] * 100 : .6f}%." 
+    best_option = f"With **Surgeon Experience:** {posible_values[list(min_probability.keys())[-1]][0]}, **Configuration:** {posible_values[list(min_probability.keys())[-1]][1]} and **Approach:**  {posible_values[list(min_probability.keys())[-1]][2]}, the likelihood of anastomotic leakage is the lowest with a value of:{min_probability[list(min_probability.keys())[-1]] * 100 : .6f}%." 
     difference_message = f"This is a reduction of {(max_probability[list(max_probability.keys())[-1]] - min_probability[list(min_probability.keys())[-1]]) * 100 : .6}% with respect to other options."
     st.write(best_option)
     st.write(difference_message)
     st.write('Results for all options:')
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.write(' ')
-    
-    with col2:
-        st.write(formatted_df)
-    
-    with col3:
-        st.write(' ')
+    st.write(formatted_df)
 
     return df
 
@@ -381,10 +392,10 @@ if selected == 'Prediction':
     preoperative_use_of_immunosuppressive_drugs = st.sidebar.selectbox('Use of Inmunosuppressive Drugs', ('Yes' , 'No'))
     tnf_alpha_inhib = st.sidebar.selectbox('TNF Alpha Inhib', ('Yes' , 'No'))
     emergency_surgery = st.sidebar.selectbox('Emergency Surgery', ('Yes' , 'No'))
-    approach = st.sidebar.selectbox('Approach', ('1: Laparoscopic' ,
-                                                 '2: Robotic' , '3: Open to open',
-                                                 '4: Conversion to open',
-                                                 '5: Conversion to laparoscopy'))
+    #approach = st.sidebar.selectbox('Approach', ('1: Laparoscopic' ,
+    #                                             '2: Robotic' , '3: Open to open',
+    #                                             '4: Conversion to open',
+    #                                             '5: Conversion to laparoscopy'))
     preoperative_steroid_use = st.sidebar.selectbox('Steroid Use', ('Yes' , 'No'))
     preoperative_nsaids_use = st.sidebar.selectbox('Nsaids Use', ('Yes' , 'No'))
     active_smoking = st.sidebar.selectbox('Active Smoking', ('Yes' , 'No'))
@@ -411,7 +422,7 @@ if selected == 'Prediction':
                                        'preoperative_use_of_immunosuppressive_drugs' : [preoperative_use_of_immunosuppressive_drugs],
                                        'tnf_alpha_inhib' : [tnf_alpha_inhib],
                                        'emergency_surgery' : [emergency_surgery],
-                                       'approach' : [approach],
+                                       #'approach' : [approach],
                                        'preoperative_steroid_use' : [preoperative_steroid_use],
                                        'preoperative_nsaids_use' : [preoperative_nsaids_use],
                                        'active_smoking' : [active_smoking],
@@ -581,17 +592,17 @@ if selected == 'Examples':
     emergency_surgery = st.sidebar.selectbox('Emergency Surgery',
                                              ('Yes' , 'No'),
                                              index = ('Yes' , 'No').index(inverted_dictionary['emergency_surgery'][aux_patient['emergency_surgery'].values[0]]))
-    approach = st.sidebar.selectbox('Approach',
-                                    ('1: Laparoscopic' ,
-                                    '2: Robotic' , '3: Open to open',
-                                    '4: Conversion to open',
-                                    '5: Conversion to laparoscopy',
-                                    '6: Transanal (ta TME , TATA , TAMIS)'),
-                                    index = ('1: Laparoscopic' ,
-                                    '2: Robotic' , '3: Open to open',
-                                    '4: Conversion to open',
-                                    '5: Conversion to laparoscopy',
-                                    '6: Transanal (ta TME , TATA , TAMIS)').index(inverted_dictionary['approach'][aux_patient['approach'].values[0]]))
+    #approach = st.sidebar.selectbox('Approach',
+    #                                ('1: Laparoscopic' ,
+    #                                '2: Robotic' , '3: Open to open',
+    #                                '4: Conversion to open',
+    #                                '5: Conversion to laparoscopy',
+    #                                '6: Transanal (ta TME , TATA , TAMIS)'),
+    #                                index = ('1: Laparoscopic' ,
+    #                                '2: Robotic' , '3: Open to open',
+    #                                '4: Conversion to open',
+    #                                '5: Conversion to laparoscopy',
+    #                                '6: Transanal (ta TME , TATA , TAMIS)').index(inverted_dictionary['approach'][aux_patient['approach'].values[0]]))
     preoperative_steroid_use = st.sidebar.selectbox('Steroid Use',
                                                     ('Yes' , 'No'),
                                                     index = ('Yes' , 'No').index(inverted_dictionary['preoperative_steroid_use'][aux_patient['preoperative_steroid_use'].values[0]]))
@@ -654,7 +665,7 @@ if selected == 'Examples':
                                        'preoperative_use_of_immunosuppressive_drugs' : [preoperative_use_of_immunosuppressive_drugs],
                                        'tnf_alpha_inhib' : [tnf_alpha_inhib],
                                        'emergency_surgery' : [emergency_surgery],
-                                       'approach' : [approach],
+                                       #'approach' : [approach],
                                        'preoperative_steroid_use' : [preoperative_steroid_use],
                                        'preoperative_nsaids_use' : [preoperative_nsaids_use],
                                        'active_smoking' : [active_smoking],
