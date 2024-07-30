@@ -290,10 +290,10 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
         df.loc[aux_configuration , aux_surgeon] = probabilities[i].values[0]
     
     # Format of prediction
-    formatted_df = pivot_df.style.format({"Probability": "{:.4f}".format})
+    formatted_df = pivot_df.style.format({"Probability": "{:.6f}".format})
     # Create message to show the best option
     best_option = f"With **Surgeon Experience:** {posible_values[list(min_probability.keys())[-1]][0]}, **Configuration:** {posible_values[list(min_probability.keys())[-1]][1]} and **Approach:**  {posible_values[list(min_probability.keys())[-1]][2]}, the likelihood of anastomotic leakage is the lowest with a value of:{min_probability[list(min_probability.keys())[-1]] * 100 : .6f}%." 
-    difference_message = f"This is a mean reduction of {(max_probability[list(max_probability.keys())[-1]] - mean_value) * 100 : .6}% with respect to other options."
+    difference_message = f"This is a mean reduction of {(max_probability[list(max_probability.keys())[-1]] - mean_value) * 100 : .6f}% with respect to other options."
     st.write(best_option)
     st.write(difference_message)
     st.write('Results for all options:')
