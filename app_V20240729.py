@@ -231,6 +231,8 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
     values_of_surgeon_experience = {'Yes' : 2,
                                     'No' : 1}
     posible_values = list(product(values_of_surgeon_experience , values_of_anastomotic_configuration))
+    min_probability = {-1 : 2.0}
+    max_probability = {-1 : -1.0}
     
     for i in range(len(posible_values)):
         print('#' * 50)
@@ -249,6 +251,11 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
             prediction = prediction.squeeze().numpy()
         probabilities[i] = pd.DataFrame(prediction.copy() , columns = ['Probabilities']).T
         probabilities[i] = probabilities[i][1]
+        # Update max and min value
+        if probabilities[i].values[0] < min_probability[list(min_probability.keys())[-1]]:
+            min_probability[i] = probabilities[i].values[0]
+        if probabilities[i].values[0] > max_probability[list(max_probability.keys())[-1]]:
+            max_probability[i] = probabilities[i].values[0]
     # Create a dataframe with the results as a matrix
     df = pd.DataFrame(index=values_of_anastomotic_configuration.keys(), columns=values_of_surgeon_experience.keys())
     # Fill the DataFrame with the product of their corresponding values
@@ -263,6 +270,12 @@ def parser_user_input(dataframe_input , scaler , model , selected_features , tar
     
     # Format of prediction
     formatted_df = df.style.format({"Predictions": "{:.4f}".format})
+    # Create message to show the best option
+    best_option = f"With Surgeon Experience: {posible_values[list(min_probability.keys())[-1]][0]} and Configuration: {posible_values[list(min_probability.keys())[-1]][1]}, the likelihood of anastomotic leakage is the lowest with a value of:{min_probability[list(min_probability.keys())[-1]] * 100 : .6f}%." 
+    difference_message = f"This is a reduction of {(max_probability[list(max_probability.keys())[-1]] - min_probability[list(min_probability.keys())[-1]]) * 100 : .6}% with respect to other options."
+    st.write(best_option)
+    st.write(difference_message)
+    st.write('Results for all options:')
     col1, col2, col3 = st.columns(3)
 
     with col1:
